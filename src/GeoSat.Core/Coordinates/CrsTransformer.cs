@@ -10,8 +10,8 @@ namespace GeoSat.Core.Coordinates
     /// </summary>
     public class CrsTransformer
     {
-        private readonly IMathTransform _drawingToWgs84;
-        private readonly IMathTransform _wgs84ToDrawing;
+        private readonly MathTransform _drawingToWgs84;
+        private readonly MathTransform _wgs84ToDrawing;
 
         public CrsTransformer(CoordinateSystem drawingCrs)
         {
