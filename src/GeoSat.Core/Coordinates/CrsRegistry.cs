@@ -18,8 +18,15 @@ namespace GeoSat.Core.Coordinates
             "EPSG:3857", "Web Mercator",
             ProjectedCoordinateSystem.WebMercator);
 
-        // UTM Zones — add the ones your team commonly uses.
-        // These cover most of Europe; extend as needed.
+        // UTM Zones — UAE (39N, 40N) listed first, then Europe.
+        public static readonly CrsEntry Utm39N = new CrsEntry(
+            "EPSG:32639", "UTM Zone 39N",
+            ProjectedCoordinateSystem.WGS84_UTM(39, true));
+
+        public static readonly CrsEntry Utm40N = new CrsEntry(
+            "EPSG:32640", "UTM Zone 40N",
+            ProjectedCoordinateSystem.WGS84_UTM(40, true));
+
         public static readonly CrsEntry Utm32N = new CrsEntry(
             "EPSG:32632", "UTM Zone 32N",
             ProjectedCoordinateSystem.WGS84_UTM(32, true));
@@ -41,6 +48,8 @@ namespace GeoSat.Core.Coordinates
         {
             Wgs84LatLon,
             WebMercator,
+            Utm39N,
+            Utm40N,
             Utm32N,
             Utm33N,
             Utm34N,

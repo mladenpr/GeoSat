@@ -16,10 +16,13 @@ namespace GeoSat.Plugin.AutoCAD
         /// <summary>Save the selected CRS code to the drawing's custom properties.</summary>
         public static void Save(Document doc, CrsEntry crs)
         {
-            var db = doc.Database;
-            var info = new DatabaseSummaryInfoBuilder(db.SummaryInfo);
-            info.CustomPropertyTable[CrsPropertyName] = crs.Code;
-            db.SummaryInfo = info.ToDatabaseSummaryInfo();
+            using (doc.LockDocument())
+            {
+                var db = doc.Database;
+                var info = new DatabaseSummaryInfoBuilder(db.SummaryInfo);
+                info.CustomPropertyTable[CrsPropertyName] = crs.Code;
+                db.SummaryInfo = info.ToDatabaseSummaryInfo();
+            }
         }
 
         /// <summary>Try to load a previously saved CRS from the drawing. Returns null if not set.</summary>
