@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Autodesk.AutoCAD.Runtime;
 
 [assembly: ExtensionApplication(typeof(GeoSat.Plugin.Plugin))]
@@ -12,8 +15,16 @@ namespace GeoSat.Plugin
     /// </summary>
     public class Plugin : IExtensionApplication
     {
+        private static readonly string PluginDir =
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
         public void Initialize()
         {
+            // AutoCAD is the host process and ignores plugin binding redirects.
+            // Handle version mismatches (e.g. System.Runtime.CompilerServices.Unsafe
+            // 4.0.4.1 requested but 6.0.0.0 ships) by loading from the plugin directory.
+            AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+
             var editor = Autodesk.AutoCAD.ApplicationServices.Core.Application
                 .DocumentManager.MdiActiveDocument?.Editor;
 
@@ -22,7 +33,18 @@ namespace GeoSat.Plugin
 
         public void Terminate()
         {
-            // Clean up resources if needed
+            AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
+        }
+
+        private static Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+            var path = Path.Combine(PluginDir, assemblyName.Name + ".dll");
+
+            if (File.Exists(path))
+                return Assembly.LoadFrom(path);
+
+            return null;
         }
     }
 }
