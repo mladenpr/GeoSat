@@ -2,17 +2,18 @@ using System;
 using Autodesk.AutoCAD.ApplicationServices.Core;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
+using GeoSat.Core.Coordinates;
 using GeoSat.Plugin.AutoCAD;
 
 namespace GeoSat.Plugin.Commands
 {
     /// <summary>
-    /// GEOSATSET command — configure API credentials and output directory.
+    /// GEOSATSET command — configure API credentials, output directory, and drawing CRS.
     /// For MVP, uses command-line prompts. Can be replaced with WPF dialog later.
     /// </summary>
     public class SettingsCommand
     {
-        [CommandMethod("GEOSATSET")]
+        [CommandMethod("GEOSATSET", CommandFlags.Session)]
         public void Configure()
         {
             var doc = Application.DocumentManager.MdiActiveDocument;
@@ -22,6 +23,29 @@ namespace GeoSat.Plugin.Commands
 
             editor.WriteMessage("\n=== GeoSat Settings ===\n");
 
+            // --- CRS for this drawing ---
+            var currentCrs = DrawingCrs.Load(doc);
+            editor.WriteMessage($"\nCurrent drawing CRS: {(currentCrs != null ? currentCrs.ToString() : "not set")}\n");
+
+            var options = CrsRegistry.All;
+            editor.WriteMessage("Select coordinate system:\n");
+            for (int i = 0; i < options.Count; i++)
+                editor.WriteMessage($"  {i + 1}. {options[i]}\n");
+
+            var crsOpt = new PromptIntegerOptions($"\nEnter choice [1-{options.Count}] or 0 to keep current: ")
+            {
+                LowerLimit = 0,
+                UpperLimit = options.Count,
+            };
+            var crsResult = editor.GetInteger(crsOpt);
+            if (crsResult.Status == PromptStatus.OK && crsResult.Value > 0)
+            {
+                var newCrs = options[crsResult.Value - 1];
+                DrawingCrs.Save(doc, newCrs);
+                editor.WriteMessage($"\n[GeoSat] CRS set to {newCrs}.\n");
+            }
+
+            // --- API credentials ---
             // Client ID
             var clientIdOpt = new PromptStringOptions($"\nSentinel Hub Client ID [{Mask(settings.ClientId)}]: ")
             {
