@@ -1,0 +1,29 @@
+## .NET / Visual Studio
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+.vs/
+*.csproj.user
+
+## Build outputs
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+## NuGet
+packages/
+*.nupkg
+
+## IDE
+.idea/
+*.sln.iml
+
+## OS
+.DS_Store
+Thumbs.db
+
+## GeoSat settings (contains API secrets — never commit)
+settings.json

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- netstandard2.0: works with both .NET Framework 4.8 (AutoCAD 2022-2024)
+         AND .NET 8.0 (AutoCAD 2025+). Future-proof. -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>GeoSat.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ProjNet" Version="2.0.0" />
+    <!-- ImageSharp 2.x supports netstandard2.0; 3.x requires .NET 6+ -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
+    <PackageReference Include="System.Text.Json" Version="6.0.10" />
+  </ItemGroup>
+
+</Project>
