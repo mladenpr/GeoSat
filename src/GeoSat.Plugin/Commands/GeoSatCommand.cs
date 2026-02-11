@@ -46,8 +46,8 @@ namespace GeoSat.Plugin.Commands
 
                 // --- Step 2: Load settings and validate ---
                 var settings = SettingsStore.Load();
-                var config = SettingsStore.ToSentinelConfig(settings);
-                if (config == null)
+                var fetcher = SettingsStore.CreateTileFetcher(settings);
+                if (fetcher == null)
                 {
                     editor.WriteMessage("\n[GeoSat] API credentials not configured. Run GEOSATSET first.\n");
                     return;
@@ -71,7 +71,7 @@ namespace GeoSat.Plugin.Commands
                 var progress = new Progress<(int Done, int Total)>(p =>
                     editor.WriteMessage($"\r[GeoSat] Downloading tiles: {p.Done}/{p.Total}"));
 
-                using (var engine = new GeoSatEngine(crs, config))
+                using (var engine = new GeoSatEngine(crs, fetcher))
                 {
                     var result = await engine.FetchImageryAsync(
                         c1.X, c1.Y, c2.X, c2.Y,

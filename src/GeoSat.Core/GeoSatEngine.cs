@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using GeoSat.Core.Cache;
 using GeoSat.Core.Coordinates;
 using GeoSat.Core.Imagery;
 using GeoSat.Core.WorldFile;
@@ -17,12 +16,12 @@ namespace GeoSat.Core
     public class GeoSatEngine : IDisposable
     {
         private readonly CrsTransformer _crs;
-        private readonly WmtsTileFetcher _fetcher;
+        private readonly ITileFetcher _fetcher;
 
-        public GeoSatEngine(CrsEntry drawingCrs, SentinelHubConfig config, DiskTileCache cache = null)
+        public GeoSatEngine(CrsEntry drawingCrs, ITileFetcher fetcher)
         {
             _crs = new CrsTransformer(drawingCrs.CoordinateSystem);
-            _fetcher = new WmtsTileFetcher(config, cache);
+            _fetcher = fetcher ?? throw new ArgumentNullException(nameof(fetcher));
         }
 
         /// <summary>

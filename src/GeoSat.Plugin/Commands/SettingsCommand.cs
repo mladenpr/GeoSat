@@ -45,33 +45,61 @@ namespace GeoSat.Plugin.Commands
                 editor.WriteMessage($"\n[GeoSat] CRS set to {newCrs}.\n");
             }
 
-            // --- API credentials ---
-            // Client ID
-            var clientIdOpt = new PromptStringOptions($"\nSentinel Hub Client ID [{Mask(settings.ClientId)}]: ")
-            {
-                AllowSpaces = false,
-            };
-            var clientIdResult = editor.GetString(clientIdOpt);
-            if (clientIdResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(clientIdResult.StringResult))
-                settings.ClientId = clientIdResult.StringResult;
+            // --- Imagery provider ---
+            var currentProvider = settings.Provider == ImageryProvider.Mapbox ? "Mapbox" : "Sentinel Hub";
+            editor.WriteMessage($"\nCurrent imagery provider: {currentProvider}\n");
+            editor.WriteMessage("  1. Mapbox Satellite\n");
+            editor.WriteMessage("  2. Sentinel Hub (Copernicus)\n");
 
-            // Client Secret
-            var secretOpt = new PromptStringOptions($"\nSentinel Hub Client Secret [{Mask(settings.ClientSecret)}]: ")
+            var provOpt = new PromptIntegerOptions("\nSelect provider [1-2] or 0 to keep current: ")
             {
-                AllowSpaces = false,
+                LowerLimit = 0,
+                UpperLimit = 2,
             };
-            var secretResult = editor.GetString(secretOpt);
-            if (secretResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(secretResult.StringResult))
-                settings.ClientSecret = secretResult.StringResult;
+            var provResult = editor.GetInteger(provOpt);
+            if (provResult.Status == PromptStatus.OK && provResult.Value > 0)
+            {
+                settings.Provider = provResult.Value == 1 ? ImageryProvider.Mapbox : ImageryProvider.Sentinel;
+            }
 
-            // Instance ID
-            var instanceOpt = new PromptStringOptions($"\nSentinel Hub Instance ID [{Mask(settings.InstanceId)}]: ")
+            // --- Provider-specific credentials ---
+            if (settings.Provider == ImageryProvider.Mapbox)
             {
-                AllowSpaces = false,
-            };
-            var instanceResult = editor.GetString(instanceOpt);
-            if (instanceResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(instanceResult.StringResult))
-                settings.InstanceId = instanceResult.StringResult;
+                var tokenOpt = new PromptStringOptions($"\nMapbox Access Token [{Mask(settings.MapboxAccessToken)}]: ")
+                {
+                    AllowSpaces = false,
+                };
+                var tokenResult = editor.GetString(tokenOpt);
+                if (tokenResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(tokenResult.StringResult))
+                    settings.MapboxAccessToken = tokenResult.StringResult;
+            }
+            else
+            {
+                // Sentinel Hub credentials
+                var clientIdOpt = new PromptStringOptions($"\nSentinel Hub Client ID [{Mask(settings.ClientId)}]: ")
+                {
+                    AllowSpaces = false,
+                };
+                var clientIdResult = editor.GetString(clientIdOpt);
+                if (clientIdResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(clientIdResult.StringResult))
+                    settings.ClientId = clientIdResult.StringResult;
+
+                var secretOpt = new PromptStringOptions($"\nSentinel Hub Client Secret [{Mask(settings.ClientSecret)}]: ")
+                {
+                    AllowSpaces = false,
+                };
+                var secretResult = editor.GetString(secretOpt);
+                if (secretResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(secretResult.StringResult))
+                    settings.ClientSecret = secretResult.StringResult;
+
+                var instanceOpt = new PromptStringOptions($"\nSentinel Hub Instance ID [{Mask(settings.InstanceId)}]: ")
+                {
+                    AllowSpaces = false,
+                };
+                var instanceResult = editor.GetString(instanceOpt);
+                if (instanceResult.Status == PromptStatus.OK && !string.IsNullOrWhiteSpace(instanceResult.StringResult))
+                    settings.InstanceId = instanceResult.StringResult;
+            }
 
             // Output directory
             var outDirOpt = new PromptStringOptions($"\nOutput directory [{settings.OutputDirectory}]: ")
