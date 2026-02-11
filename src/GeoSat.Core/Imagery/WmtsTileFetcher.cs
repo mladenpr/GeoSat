@@ -14,7 +14,7 @@ namespace GeoSat.Core.Imagery
     /// Downloads satellite imagery tiles from Sentinel Hub WMTS service.
     /// Handles OAuth2 authentication and tile caching.
     /// </summary>
-    public class WmtsTileFetcher : IDisposable
+    public class WmtsTileFetcher : ITileFetcher
     {
         private readonly SentinelHubConfig _config;
         private readonly HttpClient _http;
