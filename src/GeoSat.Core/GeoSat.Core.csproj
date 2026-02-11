@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="GeoSat.Core.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <!-- ImageSharp 2.x supports netstandard2.0; 3.x requires .NET 6+ -->
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.9" />
